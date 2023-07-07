@@ -58,7 +58,7 @@ void Player::Update(float dt)
 	SpriteGo::Update(dt);
 	//230707장다훈
 	//장전중일때 총안나오게 reloadTimer 0 이하로 안내려가게
-	if(reloadTimer > 0)
+	if(reloadTimer >= 0)
 		reloadTimer -= dt;
 
 	sf::Vector2f mousePos = INPUT_MGR.GetMousePos();
@@ -101,7 +101,7 @@ void Player::Update(float dt)
 	*/
 	//230707 장다훈
 	//원문 위 주석에 있음, 마우스 클릭, 탄창 내 탄 수, 재장전중 점검
-	if (INPUT_MGR.GetMouseButtonDown(sf::Mouse::Left) && reloadTimer > 0 && curAmmo > 0)
+	if (INPUT_MGR.GetMouseButtonDown(sf::Mouse::Left) && reloadTimer < 0 && curAmmo > 0)
 	{		
 		Bullet* bullet = poolBullets.Get();
 		bullet->Fire(GetPosition(), look, 1000.f);
@@ -114,6 +114,23 @@ void Player::Update(float dt)
 			bullet->SetZombieList(sceneDev1->GetZombieList());
 			sceneDev1->AddGo(bullet);
 		}		
+
+		std::cout << "Bang!" << std::endl;
+		std::cout << "Bang!" << std::endl;
+		std::cout << "Bang!" << std::endl;
+		std::cout << "Bang!" << std::endl;
+		std::cout << "Bang!" << std::endl;
+		std::cout << "Bang!" << std::endl;
+	}
+	std::cout<< curAmmo << "/" << remainAmmo << "/" << reloadTimer <<std::endl;
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::R))
+	{
+		ReloadMagazine();
+		std::cout << "Reload!" << std::endl;
+		std::cout << "Reload!" << std::endl;
+		std::cout << "Reload!" << std::endl;
+		std::cout << "Reload!" << std::endl;
+		std::cout << "Reload!" << std::endl;
 	}
 }
 
