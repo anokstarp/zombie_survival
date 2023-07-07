@@ -17,6 +17,14 @@ protected:
 	int maxHp = 100;
 	int hp = 0;
 
+	//230707 장다훈
+	//탄 관련 옵션
+	int curAmmo; 
+	int magCapacity;
+	int remainAmmo;
+	float reloadingSpeed;
+	float reloadTimer;
+
 	ObjectPool<Bullet> poolBullets;
 
 public:
@@ -32,6 +40,9 @@ public:
 	void SetWallBounds(const sf::FloatRect& bounds);
 
 	bool isAlive = false;
+	//230707 장다훈
+	//재장전 구현
+	void ReloadMagazine();
 
 	void OnHitted(int damage);
 	void OnDie();
