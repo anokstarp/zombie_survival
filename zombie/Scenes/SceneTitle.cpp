@@ -2,8 +2,11 @@
 #include "SceneTitle.h"
 #include "ResourceMgr.h"
 #include "TextGo.h"
+#include "InputMgr.h"
+#include "SceneMgr.h"
 
 SceneTitle::SceneTitle(SceneId id)
+	: Scene(SceneId::Title)
 {
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/background.png"));
 	resources.push_back(std::make_tuple(ResourceTypes::Font, "fonts/zombiecontrol.ttf"));
@@ -46,6 +49,11 @@ void SceneTitle::Exit()
 void SceneTitle::Update(float dt)
 {
 	Scene::Update(dt);
+
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Enter))
+	{
+		SCENE_MGR.ChangeScene(SceneId::Dev1);
+	}
 }
 
 void SceneTitle::Draw(sf::RenderWindow& window)

@@ -9,8 +9,8 @@ public:
 	SceneTitle(SceneId id = SceneId::Title);
 	virtual ~SceneTitle();
 
-	virtual void Init() = 0;
-	virtual void Release() = 0;
+	virtual void Init();
+	virtual void Release();
 
 	virtual void Enter();
 	virtual void Exit();
