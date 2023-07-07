@@ -2,6 +2,7 @@
 #include "SceneMgr.h"
 #include "Scene.h"
 #include "SceneDev1.h"
+#include "SceneTitle.h"
 
 void SceneMgr::Init()
 {
@@ -10,6 +11,7 @@ void SceneMgr::Init()
 		Release();
 	}
 
+	scenes.push_back(new SceneTitle());
 	scenes.push_back(new SceneDev1());
 
 	for (auto scene : scenes)

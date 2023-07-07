@@ -112,13 +112,28 @@ void SceneDev1::Exit()
 
 void SceneDev1::Update(float dt)
 {
-	Scene::Update(dt);
-
+	//2023-07-07 이남석
+	//Scene::Update 위치 수정, 사망시 키 입력 받아서 초기화
 	if (isGameOver)
 	{
-		SCENE_MGR.ChangeScene(sceneId);
+		std::cout << "죽음" << std::endl;
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Y))
+		{
+			SCENE_MGR.ChangeScene(sceneId);
+			return;
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::N))
+		{
+			SCENE_MGR.ChangeScene(sceneId);
+			return;
+		}
+		
+		//SCENE_MGR.ChangeScene(sceneId);
 		return;
 	}
+
+	Scene::Update(dt);
+	////////////////////////////////////////////////////
 
 	worldView.setCenter(player->GetPosition());
 
@@ -240,7 +255,6 @@ void SceneDev1::OnDiePlayer()
 {
 	isGameOver = true;
 	
-	//핏자국 없애기 추가해야됨
 	
 	//SCENE_MGR.ChangeScene(sceneId);
 }
