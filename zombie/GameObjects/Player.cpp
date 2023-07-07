@@ -114,24 +114,12 @@ void Player::Update(float dt)
 			bullet->SetZombieList(sceneDev1->GetZombieList());
 			sceneDev1->AddGo(bullet);
 		}		
-
-		std::cout << "Bang!" << std::endl;
-		std::cout << "Bang!" << std::endl;
-		std::cout << "Bang!" << std::endl;
-		std::cout << "Bang!" << std::endl;
-		std::cout << "Bang!" << std::endl;
-		std::cout << "Bang!" << std::endl;
 	}
-	std::cout<< curAmmo << "/" << remainAmmo << "/" << reloadTimer <<std::endl;
 	if (INPUT_MGR.GetKeyDown(sf::Keyboard::R))
 	{
 		ReloadMagazine();
-		std::cout << "Reload!" << std::endl;
-		std::cout << "Reload!" << std::endl;
-		std::cout << "Reload!" << std::endl;
-		std::cout << "Reload!" << std::endl;
-		std::cout << "Reload!" << std::endl;
 	}
+	//test//std::cout<< curAmmo << "/" << remainAmmo << "/" << reloadTimer <<std::endl;
 }
 
 void Player::Draw(sf::RenderWindow& window)
