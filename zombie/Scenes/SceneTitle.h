@@ -7,15 +7,15 @@ protected:
 
 public:
 	SceneTitle(SceneId id = SceneId::Title);
-	virtual ~SceneTitle();
+	virtual ~SceneTitle() override;
 
-	virtual void Init();
-	virtual void Release();
+	virtual void Init() override;
+	virtual void Release() override;
 
-	virtual void Enter();
-	virtual void Exit();
+	virtual void Enter() override;
+	virtual void Exit() override;
 
-	virtual void Update(float dt);
-	virtual void Draw(sf::RenderWindow& window);
+	virtual void Update(float dt) override;
+	virtual void Draw(sf::RenderWindow& window) override;
 };
 
