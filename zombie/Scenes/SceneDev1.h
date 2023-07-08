@@ -18,6 +18,17 @@ protected:
 	sf::FloatRect wallBounds;
 	bool isGameOver;
 
+	// ±è¹ÎÁö, 230708, ui data
+	int score = 0;
+	int hiScore = 0;
+	int leftBullets = 0;
+	int wave = 0;
+	int leftZombies = 0;
+
+	int frame = 0;
+	float dtTotal = 0.f;
+	//////////////////
+
 public:
 	SceneDev1();
 	virtual ~SceneDev1() override;

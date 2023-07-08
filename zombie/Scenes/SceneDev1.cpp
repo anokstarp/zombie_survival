@@ -9,10 +9,18 @@
 #include "Framework.h"
 #include "Zombie.h"
 #include "SpriteEffect.h"
+// ±è¹ÎÁö, 230708
+#include "TextGo.h"
+#include "RectGo.h"
+////////////////
 
 SceneDev1::SceneDev1()
 	: Scene(SceneId::Dev1), player(nullptr)
 {
+	// ±è¹ÎÁö, 230708
+	resources.push_back(std::make_tuple(ResourceTypes::Font, "fonts/zombiecontrol.ttf"));
+	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/ammo_icon.png"));
+	////////////////
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/player.png"));
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/background_sheet.png"));
 
@@ -45,7 +53,19 @@ void SceneDev1::Init()
 	player = (Player*)AddGo(new Player("graphics/player.png", "Player"));
 	VertexArrayGo* background = CreateBackground({ 50, 50 }, tileWorldSize, tileTexSize, "graphics/background_sheet.png");
 	AddGo(background);
-	
+
+	// ±è¹ÎÁö, 230708, ui AddGo
+	AddGo(new TextGo("score", "fonts/zombiecontrol.ttf"));
+	AddGo(new TextGo("hiScore", "fonts/zombiecontrol.ttf"));
+	AddGo(new TextGo("leftBullets", "fonts/zombiecontrol.ttf"));
+	AddGo(new TextGo("wave", "fonts/zombiecontrol.ttf"));
+	AddGo(new TextGo("leftZombies", "fonts/zombiecontrol.ttf"));
+	AddGo(new SpriteGo("graphics/ammo_icon.png", "bulletImg"));
+	AddGo(new RectGo("hpBar"));
+
+	AddGo(new TextGo("fps", "fonts/zombiecontrol.ttf"));
+	////////////////////////
+
 	for (auto go : gameObjects)
 	{
 		go->Init();
@@ -97,6 +117,84 @@ void SceneDev1::Enter()
 
 	isGameOver = false;
 	player->SetPosition(0.f, 0.f);
+
+	// ±è¹ÎÁö, 230708, ui ¼¼ÆÃ
+	TextGo* score = (TextGo*)FindGo("score");
+	TextGo* hiScore = (TextGo*)FindGo("hiScore");
+	TextGo* leftBullets = (TextGo*)FindGo("leftBullets");
+	TextGo* wave = (TextGo*)FindGo("wave");
+	TextGo* leftZombies = (TextGo*)FindGo("leftZombies");
+	SpriteGo* bulletImg = (SpriteGo*)FindGo("bulletImg");
+	RectGo* hpBar = (RectGo*)FindGo("hpBar");
+	TextGo* fps = (TextGo*)FindGo("fps");
+
+	sf::Vector2f screenSize = FRAMEWORK.GetWindowSize();
+	sf::Vector2f centerPos = screenSize * 0.5f;
+
+	std::stringstream ss;
+	ss << "SCORE:" << this->score;
+	score->text.setString(ss.str());
+	score->text.setCharacterSize(50);
+	score->text.setFillColor(sf::Color::White);
+	score->SetOrigin(Origins::TL);
+	score->SetPosition(10.f, 10.f);
+	score->sortLayer = 100;
+
+	std::stringstream ss2;
+	ss2 << "HI SCORE:" << this->hiScore;
+	hiScore->text.setString(ss2.str());
+	hiScore->text.setCharacterSize(50);
+	hiScore->text.setFillColor(sf::Color::White);
+	hiScore->SetOrigin(Origins::TL);
+	hiScore->SetPosition(screenSize.x - 300.f, 10.f);
+	hiScore->sortLayer = 100;
+
+	std::stringstream ss3;
+	ss3 << this->leftBullets;
+	leftBullets->text.setString(ss3.str());
+	leftBullets->text.setCharacterSize(50);
+	leftBullets->text.setFillColor(sf::Color::White);
+	leftBullets->SetOrigin(Origins::BL);
+	leftBullets->SetPosition(100.f, screenSize.y - 10.f);
+	leftBullets->sortLayer = 100;
+
+	std::stringstream ss4;
+	ss4 << "WAVE:" << this->wave;
+	wave->text.setString(ss4.str());
+	wave->text.setCharacterSize(50);
+	wave->text.setFillColor(sf::Color::White);
+	wave->SetOrigin(Origins::BL);
+	wave->SetPosition(centerPos.x + 100.f, screenSize.y - 10.f);
+	wave->sortLayer = 100;
+
+	std::stringstream ss5;
+	ss5 << "ZOMBIES:" << this->leftZombies;
+	leftZombies->text.setString(ss5.str());
+	leftZombies->text.setCharacterSize(50);
+	leftZombies->text.setFillColor(sf::Color::White);
+	leftZombies->SetOrigin(Origins::BL);
+	leftZombies->SetPosition(screenSize.x - 300.f, screenSize.y - 10.f);
+	leftZombies->sortLayer = 100;
+
+	bulletImg->SetOrigin(Origins::BL);
+	bulletImg->SetPosition(40.f, screenSize.y);
+	bulletImg->sortLayer = 100;
+
+	sf::RectangleShape& hpRect = hpBar->GetRect();
+	hpRect.setFillColor(sf::Color::Red);
+	hpRect.setSize(sf::Vector2f( 350.f, 40.f ));
+	hpBar->SetOrigin(Origins::BL);
+	hpBar->SetPosition(250.f, screenSize.y - 10.f);
+	hpBar->sortLayer = 100;
+
+	fps->text.setString("FPS:0");
+	fps->text.setCharacterSize(50);
+	fps->text.setFillColor(sf::Color::White);
+	fps->SetOrigin(Origins::TC);
+	fps->SetPosition(centerPos.x, 10.f);
+	fps->sortLayer = 100;
+
+	/////////////////////////
 }
 
 void SceneDev1::Exit()
@@ -112,6 +210,20 @@ void SceneDev1::Exit()
 
 void SceneDev1::Update(float dt)
 {
+	// ±è¹ÎÁö, 230708, fps Ãâ·Â
+	frame++;
+	dtTotal += dt;
+	if (dtTotal >= 1.f)
+	{
+		dtTotal = 0.f;
+		std::stringstream ss;
+		ss << "FPS:" << frame;
+		TextGo* fps = (TextGo*)FindGo("fps");
+		fps->text.setString(ss.str());
+		frame = 0;
+	}
+	/////////////////////////
+
 	//2023-07-07 ÀÌ³²¼®
 	//Scene::Update À§Ä¡ ¼öÁ¤, »ç¸Á½Ã Å° ÀÔ·Â ¹Þ¾Æ¼­ ÃÊ±âÈ­
 	if (isGameOver)

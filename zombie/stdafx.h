@@ -10,6 +10,9 @@
 #include <random>
 #include <tuple>
 #include <functional>
+// ±è¹ÎÁö, 230708
+#include <sstream>
+/////////////////
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
