@@ -22,7 +22,7 @@ protected:
 	int score = 0;
 	int hiScore = 0;
 	int leftBullets = 0;
-	int wave = 0;
+	int wave = 1;
 	int leftZombies = 0;
 
 	int frame = 0;
@@ -55,6 +55,10 @@ public:
 	void OnDiePlayer();
 
 	const std::list<Zombie*>* GetZombieList() const;
+
+	// ±è¹ÎÁö, 230708, UI °ª ¼¼ÆÃ ÇÔ¼ö
+	void SetUiData();
+	///////////////////////////////
 };
 
 template<typename T>

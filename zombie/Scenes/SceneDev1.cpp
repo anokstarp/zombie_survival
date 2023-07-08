@@ -131,6 +131,7 @@ void SceneDev1::Enter()
 	sf::Vector2f screenSize = FRAMEWORK.GetWindowSize();
 	sf::Vector2f centerPos = screenSize * 0.5f;
 
+	this->score = 0;
 	std::stringstream ss;
 	ss << "SCORE:" << this->score;
 	score->text.setString(ss.str());
@@ -241,6 +242,8 @@ void SceneDev1::Update(float dt)
 	sf::RectangleShape& hpRect = hpBar->GetRect();
 	float hpBarWidth = (float)player->GetHp() / 100.f;
 	hpRect.setSize(sf::Vector2f(350.f * hpBarWidth, 40.f));
+	// ui값 세팅 함수
+	SetUiData();
 	/////////////////////////
 
 	//2023-07-07 이남석
@@ -372,6 +375,10 @@ void SceneDev1::ClearZombies()
 
 void SceneDev1::OnDieZombie(Zombie* zombie)
 {
+	// 김민지, 230708, score 세팅
+	score++;
+	///////////////////////////
+
 	SpriteEffect* blood = bloodEffectPool.Get();
 	blood->SetPosition(zombie->GetPosition());
 	blood->sortLayer = 0;
@@ -386,11 +393,34 @@ void SceneDev1::OnDiePlayer()
 {
 	isGameOver = true;
 	
-	
 	//SCENE_MGR.ChangeScene(sceneId);
 }
 
 const std::list<Zombie*>* SceneDev1::GetZombieList() const
 {
 	return &zombiePool.GetUseList();
+}
+
+void SceneDev1::SetUiData()
+{
+	TextGo* score = (TextGo*)FindGo("score");
+	TextGo* hiScore = (TextGo*)FindGo("hiScore");
+	TextGo* leftBullets = (TextGo*)FindGo("leftBullets");
+	TextGo* wave = (TextGo*)FindGo("wave");
+	TextGo* leftZombies = (TextGo*)FindGo("leftZombies");
+
+	std::stringstream ss;
+	ss << "SCORE:" << this->score;
+	score->text.setString(ss.str());
+
+	if (this->hiScore < this->score)
+	{
+		this->hiScore = this->score;
+		std::stringstream ss2;
+		ss2 << "HI SCORE:" << this->hiScore;
+		hiScore->text.setString(ss2.str());
+	}
+
+	// leftBullets => 탄약 구현 후 추가
+	// wave => 스테이지 구현 후 
 }
