@@ -3,7 +3,8 @@
 #include "Utils.h"
 #include "ResourceMgr.h"
 
-SpriteGo::SpriteGo(const std::string& textureId = "", const std::string& n = "")
+// ±è¹ÎÁö, 230708, ="" Áö¿ò
+SpriteGo::SpriteGo(const std::string& textureId, const std::string& n)
 	: GameObject(n), textureId(textureId)
 {
 }

@@ -1,17 +1,16 @@
 #pragma once
 #include "GameObject.h"
-class SpriteGo : public GameObject
+class RectGo :
+    public GameObject
 {
 protected:
+    sf::RectangleShape rect;
 
 public:
-	sf::Sprite sprite;
-	std::string textureId;
+	RectGo(const std::string& n = "");
+	virtual ~RectGo() override;
 
-	// ±è¹ÎÁö, 230708
-	SpriteGo(const std::string& textureId = "", const std::string& n = "");
-	/////////////////
-	virtual ~SpriteGo() override;
+	sf::RectangleShape& GetRect();
 
 	virtual void SetPosition(const sf::Vector2f& p);
 	virtual void SetPosition(float x, float y);
@@ -25,7 +24,5 @@ public:
 
 	virtual void Update(float dt) override;
 	virtual void Draw(sf::RenderWindow& window) override;
-
-
 };
 

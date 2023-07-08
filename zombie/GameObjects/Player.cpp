@@ -124,3 +124,8 @@ void Player::OnDie()
 		sceneDev1->OnDiePlayer();
 	}
 }
+
+int Player::GetHp()
+{
+	return hp;
+}

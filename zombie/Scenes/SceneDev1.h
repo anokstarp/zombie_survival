@@ -18,6 +18,17 @@ protected:
 	sf::FloatRect wallBounds;
 	bool isGameOver;
 
+	// 梯團雖, 230708, ui data
+	int score = 0;
+	int hiScore = 0;
+	int leftBullets = 0;
+	int wave = 1;
+	int leftZombies = 0;
+
+	int frame = 0;
+	float dtTotal = 0.f;
+	//////////////////
+
 public:
 	SceneDev1();
 	virtual ~SceneDev1() override;
@@ -45,6 +56,9 @@ public:
 
 	const std::list<Zombie*>* GetZombieList() const;
 
+	// 梯團雖, 230708, UI 高 撮た л熱
+	void SetUiData();
+	///////////////////////////////
 };
 
 template<typename T>
