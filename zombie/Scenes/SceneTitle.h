@@ -4,6 +4,7 @@ class SceneTitle :
     public Scene
 {
 protected:
+	sf::View titleView;
 
 public:
 	SceneTitle(SceneId id = SceneId::Title);

@@ -29,6 +29,12 @@ void SceneTitle::Init()
 	{
 		go->Init();
 	}
+
+	// Å¸ÀÌÆ² ºä
+	sf::Vector2f windowSize = FRAMEWORK.GetWindowSize();
+	sf::Vector2f centerPos = windowSize * 0.5f;
+	titleView.setSize(windowSize);
+	titleView.setCenter(centerPos);
 }
 
 void SceneTitle::Release()
@@ -77,4 +83,16 @@ void SceneTitle::Update(float dt)
 void SceneTitle::Draw(sf::RenderWindow& window)
 {
 	Scene::Draw(window);
+
+	window.setView(titleView);
+	for (auto go : gameObjects)
+	{
+		if (go->sortLayer >= 100)
+			continue;
+
+		if (go->GetActive())
+		{
+			go->Draw(window);
+		}
+	}
 }
