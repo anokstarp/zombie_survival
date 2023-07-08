@@ -210,7 +210,7 @@ void SceneDev1::Exit()
 
 void SceneDev1::Update(float dt)
 {
-	// ±ËπŒ¡ˆ, 230708, fps √‚∑¬
+	// ±ËπŒ¡ˆ, 230708, fps √‚∑¬ + hpBar √‚∑¬
 	frame++;
 	dtTotal += dt;
 	if (dtTotal >= 1.f)
@@ -222,6 +222,11 @@ void SceneDev1::Update(float dt)
 		fps->text.setString(ss.str());
 		frame = 0;
 	}
+
+	RectGo* hpBar = (RectGo*)FindGo("hpBar");
+	sf::RectangleShape& hpRect = hpBar->GetRect();
+	float hpBarWidth = (float)player->GetHp() / 100.f;
+	hpRect.setSize(sf::Vector2f(350.f * hpBarWidth, 40.f));
 	/////////////////////////
 
 	//2023-07-07 ¿Ã≥≤ºÆ

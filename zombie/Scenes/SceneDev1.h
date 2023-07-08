@@ -55,7 +55,6 @@ public:
 	void OnDiePlayer();
 
 	const std::list<Zombie*>* GetZombieList() const;
-
 };
 
 template<typename T>

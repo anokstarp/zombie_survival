@@ -35,5 +35,9 @@ public:
 
 	void OnHitted(int damage);
 	void OnDie();
+
+	// ±è¹ÎÁö, 230708, hpBar ±¸Çö¿ë get ÇÔ¼ö
+	int GetHp();
+	//////////////////////////////////////
 };
 
