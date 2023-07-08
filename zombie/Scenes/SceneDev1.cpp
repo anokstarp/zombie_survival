@@ -210,19 +210,33 @@ void SceneDev1::Exit()
 
 void SceneDev1::Update(float dt)
 {
-	// ±è¹ÎÁö, 230708, fps Ãâ·Â + hpBar Ãâ·Â
+	// ±è¹ÎÁö, 230708
+	// fps °ª ¼¼ÆÃ, Ãâ·Â
 	frame++;
 	dtTotal += dt;
 	if (dtTotal >= 1.f)
 	{
-		dtTotal = 0.f;
+		dtTotal -= 1.f;
 		std::stringstream ss;
 		ss << "FPS:" << frame;
 		TextGo* fps = (TextGo*)FindGo("fps");
 		fps->text.setString(ss.str());
 		frame = 0;
 	}
-
+	// fps on/off
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num0))
+	{
+		TextGo* fps = (TextGo*)FindGo("fps");
+		if (fps->GetActive())
+		{
+			fps->SetActive(false);
+		}
+		else
+		{
+			fps->SetActive(true);
+		}
+	}
+	// hpBar ±æÀÌ ¼¼ÆÃ, Ãâ·Â
 	RectGo* hpBar = (RectGo*)FindGo("hpBar");
 	sf::RectangleShape& hpRect = hpBar->GetRect();
 	float hpBarWidth = (float)player->GetHp() / 100.f;
