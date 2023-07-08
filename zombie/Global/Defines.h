@@ -24,9 +24,11 @@ enum class ResourceTypes
 	SoundBuffer,
 };
 
+// minji, 230707
 enum class SceneId
 {
 	None = -1,
+	Title,
 	Dev1,
 	Count,
 };
