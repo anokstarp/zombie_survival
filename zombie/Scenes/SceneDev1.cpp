@@ -121,10 +121,12 @@ void SceneDev1::Enter()
 	Scene::Enter();
 
 	isGameOver = false;
-	isStateClear = false;
+	isStageClear = false;
 	player->SetPosition(0.f, 0.f);
 
 	// 김민지, 230708, ui 세팅
+	leftZombies = 0;
+
 	TextGo* score = (TextGo*)FindGo("score");
 	TextGo* hiScore = (TextGo*)FindGo("hiScore");
 	TextGo* leftBullets = (TextGo*)FindGo("leftBullets");
@@ -282,6 +284,7 @@ void SceneDev1::Update(float dt)
 
 	//2023-07-07 이남석
 	//Scene::Update 위치 수정, 사망시 키 입력 받아서 초기화
+	if (leftZombies <= 0 && isStageStart) { isStageClear = true; }
 	if (CheckGameover())
 		return;
 	
@@ -289,6 +292,15 @@ void SceneDev1::Update(float dt)
 	//스킬 강화 업뎃
 	if (CheckStageClear())
 		return;
+
+	if (!isStageStart)
+	{
+		wave++;
+		currentStage++;
+		player->SetPosition(0.f, 0.f);
+		SpawnZombies(30 * currentStage, player->GetPosition(), 1200.f);
+		isStageStart = true;
+	}
 
 	Scene::Update(dt);
 
@@ -309,7 +321,7 @@ void SceneDev1::Update(float dt)
 	{
 		//ClearZombies();
 		ClearObjectPool(zombiePool);
-		isStateClear = true;
+		isStageClear = true;
 	}
 }
 
@@ -386,6 +398,9 @@ void SceneDev1::SpawnZombies(int count, sf::Vector2f center, float radius)
 		zombie->sortLayer = 1;
 		AddGo(zombie);
 	}
+	// 김민지, 230709, leftZombies 세팅용
+	leftZombies = count;
+	///////////////////////////////////
 }
 
 void SceneDev1::ClearZombies()
@@ -395,12 +410,23 @@ void SceneDev1::ClearZombies()
 		RemoveGo(zombie);
 	}
 	zombiePool.Clear();
+	// 김민지, 230709, leftZombies 세팅용
+	leftZombies = 0;
+	///////////////////////////////////
 }
 
 void SceneDev1::OnDieZombie(Zombie* zombie)
 {
-	// 김민지, 230708, score 세팅
+	// 김민지, 230708~9, score + leftZombies 세팅
 	score++;
+	if (leftZombies == 0)
+	{
+		leftZombies = 0;
+	}
+	else
+	{
+		leftZombies--;
+	}
 	///////////////////////////
 
 	SpriteEffect* blood = bloodEffectPool.Get();
@@ -445,6 +471,10 @@ void SceneDev1::SetUiData()
 		hiScore->text.setString(ss2.str());
 	}
 
+	std::stringstream ss3;
+	ss3 << "ZOMBIES:" << this->leftZombies;
+	leftZombies->text.setString(ss3.str());
+
 	// leftBullets => 탄약 구현 후 추가
 	// wave => 스테이지 구현 후 
 }
@@ -477,50 +507,55 @@ bool SceneDev1::CheckGameover()
 
 bool SceneDev1::CheckStageClear()
 {
-	if (isStateClear)
+	if (isStageClear)
 	{
 		TextGo* stageClear = (TextGo*)FindGo("StageClear");
 		stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 255));
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num1))
 		{	
-
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num2))
 		{
 
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num3))
 		{
 			player->IncreaseHealth(20);
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num4))
 		{
 			player->IncreaseSpeed(20);
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num5))
 		{
 			Bullet::addDamage += 5;
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num6))
 		{
 			player->IncreaseProjectile(1);
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		return true;
