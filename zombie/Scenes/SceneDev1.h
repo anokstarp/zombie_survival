@@ -17,6 +17,7 @@ protected:
 
 	sf::FloatRect wallBounds;
 	bool isGameOver;
+	bool isStateClear;
 
 	// 梯團雖, 230708, ui data
 	int score = 0;
@@ -59,6 +60,9 @@ public:
 	// 梯團雖, 230708, UI 高 撮た л熱
 	void SetUiData();
 	///////////////////////////////
+
+	bool CheckGameover();
+	bool CheckStageClear();
 };
 
 template<typename T>

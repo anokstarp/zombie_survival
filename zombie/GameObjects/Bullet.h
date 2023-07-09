@@ -10,11 +10,14 @@ protected:
 	sf::Vector2f direction;
 	float speed = 0.f;
 	float range = 2000.f;
+
 	int damage = 25;
 
 	const std::list<Zombie*>* zombies;
 
 public:
+	static int addDamage; //Ãß°¡
+
 	ObjectPool<Bullet>* pool;
 
 	Bullet(const std::string& textureId = "", const std::string& n = "");
@@ -29,5 +32,7 @@ public:
 
 	virtual void Update(float dt) override;
 	virtual void Draw(sf::RenderWindow& window) override;
+
+	void IncreaseDamage(int dmg);
 };
 

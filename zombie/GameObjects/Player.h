@@ -13,9 +13,13 @@ protected:
 	sf::Vector2f wallBoundsLT;
 	sf::Vector2f wallBoundsRB;
 
-	float speed = 500.f;
+	float speed = 300.f;
+	float addSpeed = 0.f;
 	int maxHp = 100;
 	int hp = 0;
+	int addHp = 0;
+
+	int projectile = 1;
 
 	ObjectPool<Bullet> poolBullets;
 
@@ -39,5 +43,11 @@ public:
 	// 김민지, 230708, hpBar 구현용 get 함수
 	int GetHp();
 	//////////////////////////////////////
+
+	//2023-07-09 이남석
+	void IncreaseHealth(int hp);
+	void IncreaseSpeed(float speed);
+	void IncreaseProjectile(int num);
+
 };
 

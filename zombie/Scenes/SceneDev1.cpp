@@ -65,6 +65,11 @@ void SceneDev1::Init()
 
 	AddGo(new TextGo("fps", "fonts/zombiecontrol.ttf"));
 	////////////////////////
+	//2023-07-09 이남석
+	AddGo(new TextGo("GameoverMessage", "fonts/zombiecontrol.ttf"));
+	AddGo(new TextGo("StageClear", "fonts/zombiecontrol.ttf"));
+
+
 
 	for (auto go : gameObjects)
 	{
@@ -116,6 +121,7 @@ void SceneDev1::Enter()
 	Scene::Enter();
 
 	isGameOver = false;
+	isStateClear = false;
 	player->SetPosition(0.f, 0.f);
 
 	// 김민지, 230708, ui 세팅
@@ -127,6 +133,9 @@ void SceneDev1::Enter()
 	SpriteGo* bulletImg = (SpriteGo*)FindGo("bulletImg");
 	RectGo* hpBar = (RectGo*)FindGo("hpBar");
 	TextGo* fps = (TextGo*)FindGo("fps");
+	//2023-07-09 이남석
+	TextGo* gameoverMessage = (TextGo*)FindGo("GameoverMessage");
+	TextGo* stageClear = (TextGo*)FindGo("StageClear");
 
 	sf::Vector2f screenSize = FRAMEWORK.GetWindowSize();
 	sf::Vector2f centerPos = screenSize * 0.5f;
@@ -196,6 +205,31 @@ void SceneDev1::Enter()
 	fps->sortLayer = 100;
 
 	/////////////////////////
+	//2023-07-09 이남석
+	gameoverMessage->text.setString("YOU DIED \n Continue? Y/N");
+	gameoverMessage->text.setCharacterSize(100);
+	gameoverMessage->text.setFillColor(sf::Color::Color(240, 0, 0, 0));
+	gameoverMessage->SetOrigin(Origins::MC);
+	gameoverMessage->SetPosition(centerPos);
+	gameoverMessage->sortLayer = 101;
+
+	std::stringstream ss6;
+	//ss6 << "1- INCREASED RATE OF FIRE\n";
+	//ss6 << "2- INCREASED CLIP SIZE(NEXT RELOAD)\n";
+	ss6 << "3- INCREASED MAX HEALTH\n";
+	ss6 << "4- INCREASED RUN SPEED\n";
+	ss6 << "5- INCREASED BULLET DAMAGE\n";
+	ss6 << "6- ADDITIONAL BULLET\n";
+	ss6 << "7- MORE AND BETTER HEALTH PICKUPS\n";
+	ss6 << "8- MORE AND BETTER AMMO PICKUPS\n";
+
+	stageClear->text.setString(ss6.str());
+	stageClear->text.setCharacterSize(50);
+	stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
+	stageClear->text.setLineSpacing(1.3f);
+	stageClear->SetOrigin(Origins::MC);
+	stageClear->SetPosition(centerPos);
+	stageClear->sortLayer = 101;
 }
 
 void SceneDev1::Exit()
@@ -248,26 +282,15 @@ void SceneDev1::Update(float dt)
 
 	//2023-07-07 이남석
 	//Scene::Update 위치 수정, 사망시 키 입력 받아서 초기화
-	if (isGameOver)
-	{
-		std::cout << "죽음" << std::endl;
-		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Y))
-		{
-			SCENE_MGR.ChangeScene(sceneId);
-			return;
-		}
-		if (INPUT_MGR.GetKeyDown(sf::Keyboard::N))
-		{
-			SCENE_MGR.ChangeScene(SceneId::Title);
-			return;
-		}
-		
-		//SCENE_MGR.ChangeScene(sceneId);
+	if (CheckGameover())
 		return;
-	}
+	
+	////////////////////////////////////////////////////
+	//스킬 강화 업뎃
+	if (CheckStageClear())
+		return;
 
 	Scene::Update(dt);
-	////////////////////////////////////////////////////
 
 	worldView.setCenter(player->GetPosition());
 
@@ -279,13 +302,14 @@ void SceneDev1::Update(float dt)
 
 	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num1))
 	{
-		SpawnZombies(100, player->GetPosition(), 500.f);
+		SpawnZombies(20, player->GetPosition(), 1500.f);
 	}
 
 	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num2))
 	{
 		//ClearZombies();
 		ClearObjectPool(zombiePool);
+		isStateClear = true;
 	}
 }
 
@@ -356,7 +380,7 @@ void SceneDev1::SpawnZombies(int count, sf::Vector2f center, float radius)
 		{
 			pos = center + Utils::RandomInCircle(radius);
 		}
-		while (Utils::Distance(center, pos) < 100.f && radius > 100.f);
+		while (Utils::Distance(center, pos) < 200.f && radius > 200.f);
 
 		zombie->SetPosition(pos);
 		zombie->sortLayer = 1;
@@ -423,4 +447,83 @@ void SceneDev1::SetUiData()
 
 	// leftBullets => 탄약 구현 후 추가
 	// wave => 스테이지 구현 후 
+}
+
+bool SceneDev1::CheckGameover()
+{
+	if (isGameOver)
+	{
+		TextGo* gameoverMessage = (TextGo*)FindGo("GameoverMessage");
+		gameoverMessage->text.setString("YOU DIED \n Continue? Y/N");
+		gameoverMessage->text.setCharacterSize(100);
+		gameoverMessage->text.setFillColor(sf::Color::Color(240, 0, 0, 255));
+
+		std::cout << "죽음" << std::endl;
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Y))
+		{
+			SCENE_MGR.ChangeScene(sceneId);
+			return false;
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::N))
+		{
+			SCENE_MGR.ChangeScene(SceneId::Title);
+			return false;
+		}
+		//SCENE_MGR.ChangeScene(sceneId);
+		return true;;
+	}
+	return false;
+}
+
+bool SceneDev1::CheckStageClear()
+{
+	if (isStateClear)
+	{
+		TextGo* stageClear = (TextGo*)FindGo("StageClear");
+		stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 255));
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num1))
+		{	
+
+			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
+			isStateClear = false;
+			return false;
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num2))
+		{
+
+			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
+			isStateClear = false;
+			return false;
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num3))
+		{
+			player->IncreaseHealth(20);
+			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
+			isStateClear = false;
+			return false;
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num4))
+		{
+			player->IncreaseSpeed(20);
+			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
+			isStateClear = false;
+			return false;
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num5))
+		{
+			Bullet::addDamage += 5;
+			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
+			isStateClear = false;
+			return false;
+		}
+		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num6))
+		{
+			player->IncreaseProjectile(1);
+			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
+			isStateClear = false;
+			return false;
+		}
+		return true;
+	}
+	return false;
 }

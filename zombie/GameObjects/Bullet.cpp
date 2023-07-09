@@ -4,6 +4,8 @@
 #include "SceneMgr.h"
 #include "Scene.h"
 
+int Bullet::addDamage = 0;
+
 Bullet::Bullet(const std::string& textureId, const std::string& n)
 	: SpriteGo(textureId, n)
 {
@@ -70,7 +72,7 @@ void Bullet::Update(float dt)
 		{
 			if (sprite.getGlobalBounds().intersects(zombie->sprite.getGlobalBounds()))
 			{
-				zombie->OnHitBullet(damage);
+				zombie->OnHitBullet(damage+addDamage);
 
 				SCENE_MGR.GetCurrScene()->RemoveGo(this);
 				pool->Return(this);
@@ -83,4 +85,9 @@ void Bullet::Update(float dt)
 void Bullet::Draw(sf::RenderWindow& window)
 {
 	SpriteGo::Draw(window);
+}
+
+void Bullet::IncreaseDamage(int dmg)
+{
+	addDamage += dmg;
 }
