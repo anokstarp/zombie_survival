@@ -9,7 +9,7 @@
 #include "Framework.h"
 #include "Zombie.h"
 #include "SpriteEffect.h"
-// ±è¹ÎÁö, 230708
+// ±è¹ÎÁö, 230708~9
 #include "TextGo.h"
 #include "RectGo.h"
 ////////////////
@@ -20,6 +20,13 @@ SceneDev1::SceneDev1()
 	// ±è¹ÎÁö, 230708
 	resources.push_back(std::make_tuple(ResourceTypes::Font, "fonts/zombiecontrol.ttf"));
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/ammo_icon.png"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/hit.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/pickup.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/powerup.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/reload.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/reload_failed.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/shoot.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/splat.wav"));
 	////////////////
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/player.png"));
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/background_sheet.png"));
@@ -54,13 +61,16 @@ void SceneDev1::Init()
 	VertexArrayGo* background = CreateBackground({ 50, 50 }, tileWorldSize, tileTexSize, "graphics/background_sheet.png");
 	AddGo(background);
 
-	// ±è¹ÎÁö, 230708, ui AddGo
+	// ±è¹ÎÁö, 230708~9, ui AddGo + fps + sound
 	AddGo(new TextGo("score", "fonts/zombiecontrol.ttf"));
 	AddGo(new TextGo("hiScore", "fonts/zombiecontrol.ttf"));
 	AddGo(new TextGo("leftBullets", "fonts/zombiecontrol.ttf"));
 	AddGo(new TextGo("wave", "fonts/zombiecontrol.ttf"));
 	AddGo(new TextGo("leftZombies", "fonts/zombiecontrol.ttf"));
 	AddGo(new SpriteGo("graphics/ammo_icon.png", "bulletImg"));
+	// ±è¹ÎÁö, 230709, hpBar ¹è°æ Ãß°¡
+	AddGo(new RectGo("hpBarBg"));
+	////////////////////////////////
 	AddGo(new RectGo("hpBar"));
 
 	AddGo(new TextGo("fps", "fonts/zombiecontrol.ttf"));
@@ -126,7 +136,7 @@ void SceneDev1::Enter()
 
 	// ±è¹ÎÁö, 230708, ui ¼¼ÆÃ
 	leftZombies = 0;
-	wave = 0;
+	wave = -1;
 
 	TextGo* score = (TextGo*)FindGo("score");
 	TextGo* hiScore = (TextGo*)FindGo("hiScore");
@@ -134,6 +144,9 @@ void SceneDev1::Enter()
 	TextGo* wave = (TextGo*)FindGo("wave");
 	TextGo* leftZombies = (TextGo*)FindGo("leftZombies");
 	SpriteGo* bulletImg = (SpriteGo*)FindGo("bulletImg");
+	// ±è¹ÎÁö, 230709, hpBar ¹è°æ Ãß°¡
+	RectGo* hpBarBg = (RectGo*)FindGo("hpBarBg");
+	////////////////////////////////
 	RectGo* hpBar = (RectGo*)FindGo("hpBar");
 	TextGo* fps = (TextGo*)FindGo("fps");
 	//2023-07-09 ÀÌ³²¼®
@@ -200,6 +213,14 @@ void SceneDev1::Enter()
 	hpBar->SetPosition(250.f, screenSize.y - 10.f);
 	hpBar->sortLayer = 100;
 
+	// ±è¹ÎÁö, 230709, hpBar ¹è°æ Ãß°¡
+	sf::RectangleShape& hpRectBg = hpBarBg->GetRect();
+	hpRectBg.setFillColor(sf::Color::White);
+	hpRectBg.setSize(sf::Vector2f( 350.f, 40.f ));
+	hpBarBg->SetOrigin(Origins::BL);
+	hpBarBg->SetPosition(250.f, screenSize.y - 10.f);
+	hpBarBg->sortLayer = 100;
+	///////////////////////////////
 	fps->text.setString("FPS:0");
 	fps->text.setCharacterSize(50);
 	fps->text.setFillColor(sf::Color::White);
@@ -274,11 +295,7 @@ void SceneDev1::Update(float dt)
 			fps->SetActive(true);
 		}
 	}
-	// hpBar ±æÀÌ ¼¼ÆÃ, Ãâ·Â
-	RectGo* hpBar = (RectGo*)FindGo("hpBar");
-	sf::RectangleShape& hpRect = hpBar->GetRect();
-	float hpBarWidth = (float)player->GetHp() / 100.f;
-	hpRect.setSize(sf::Vector2f(350.f * hpBarWidth, 40.f));
+	// ±è¹ÎÁö, 230709, hp¹Ù À§Ä¡ ¼¼ÆÃÇÏ´Â °Å¸¦ ui¼¼ÆÃÇÔ¼ö·Î ¿Å±è
 	// ui°ª ¼¼ÆÃ ÇÔ¼ö
 	SetUiData();
 	/////////////////////////
@@ -299,6 +316,12 @@ void SceneDev1::Update(float dt)
 		wave++;
 		// ±è¹ÎÁö, 230709, ¸Å ½ºÅ×ÀÌÁö¸¶´Ù score 0À¸·Î ÃÊ±âÈ­
 		score = 0;
+
+		if (wave != 0)
+		{
+			sound.setBuffer(*RESOURCE_MGR.GetSoundBuffer("sound/powerup.wav"));
+			sound.play();
+		}
 		////////////////////////////////////////////////
 		currentStage++;
 		player->SetPosition(0.f, 0.f);
@@ -446,7 +469,10 @@ void SceneDev1::OnDieZombie(Zombie* zombie)
 void SceneDev1::OnDiePlayer()
 {
 	isGameOver = true;
-	
+	// ±è¹ÎÁö, 230709, Á×À½ »ç¿îµå
+	sound.setBuffer(*RESOURCE_MGR.GetSoundBuffer("sound/splat.wav"));
+	sound.play();
+	///////////////////////////
 	//SCENE_MGR.ChangeScene(sceneId);
 }
 
@@ -462,6 +488,18 @@ void SceneDev1::SetUiData()
 	TextGo* leftBullets = (TextGo*)FindGo("leftBullets");
 	TextGo* wave = (TextGo*)FindGo("wave");
 	TextGo* leftZombies = (TextGo*)FindGo("leftZombies");
+	RectGo* hpBar = (RectGo*)FindGo("hpBar");
+
+	sf::RectangleShape& hpRect = hpBar->GetRect();
+	if (player->GetHp() >= 100)
+	{
+		hpRect.setSize(sf::Vector2f(350.f, 40.f));
+	}
+	else
+	{
+		float hpBarWidth = (float)player->GetHp() / 100.f;
+		hpRect.setSize(sf::Vector2f(350.f * hpBarWidth, 40.f));
+	}
 
 	std::stringstream ss;
 	ss << "SCORE:" << this->score;

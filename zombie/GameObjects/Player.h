@@ -19,6 +19,10 @@ protected:
 	int hp = 0;
 	int addHp = 0;
 
+	// ±è¹ÎÁö, 230709, »ç¿îµå Ãß°¡
+	sf::Sound sound;
+	///////////////////////////
+
 	int projectile = 1;
 
 	ObjectPool<Bullet> poolBullets;

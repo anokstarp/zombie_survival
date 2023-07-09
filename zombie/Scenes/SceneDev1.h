@@ -27,11 +27,13 @@ protected:
 	int score = 0;
 	int hiScore = 0;
 	int leftBullets = 0;
-	int wave = 0;
+	int wave = -1;
 	int leftZombies = 0;
 
 	int frame = 0;
 	float dtTotal = 0.f;
+
+	sf::Sound sound;
 	//////////////////
 
 public:
