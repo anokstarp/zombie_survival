@@ -12,7 +12,7 @@ public:
 	enum class Types
 	{
 		MediKit,
-		Ammo
+		Ammo,
 	};
 	static const int TotalTypes = 2;
 	static const std::string TextureIds[2];
@@ -25,7 +25,7 @@ protected:
 	int amount;
 
 	Player* player = nullptr;
-	ObjectPool<SpriteItem*>* pool = nullptr;
+	ObjectPool<SpriteItem>* pool = nullptr;
 public:
 	SpriteItem(const std::string& n = "");
 	virtual ~SpriteItem() override;
@@ -33,8 +33,9 @@ public:
 	virtual void Reset() override;
 
 	void SetType(Types type);
-	void AddAmount(Types type, int amount);
+	void AddAmount(Types type, int amount) { SpriteItem::Amounts[(int)type] += amount; }
+	void SetPool(ObjectPool<SpriteItem>* pool) { this->pool = pool; }
 
-	void IsCollidedWithItem();
+	void UseItem();
 	void SetPlayer(Player* player);
 };

@@ -20,6 +20,9 @@ protected:
 
 	sf::FloatRect wallBounds;
 	bool isGameOver;
+	
+	float itemTimer = 30;
+	float itemTimerdefault = 30;
 
 public:
 	SceneDev1();
@@ -49,6 +52,7 @@ public:
 	const std::list<Zombie*>* GetZombieList() const;
 
 	void SpawnItem(sf::Vector2f center, float radius);
+	void UseAndDeleteItem(SpriteItem* item);
 };
 
 template<typename T>

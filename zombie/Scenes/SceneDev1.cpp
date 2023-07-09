@@ -85,6 +85,7 @@ void SceneDev1::Init()
 	//230710 장다훈
 	itemPool.OnCreate = [this](SpriteItem* item) 
 	{
+		item->SetPool(&itemPool);
 		item->SetPlayer(player); 
 		item->sortLayer = 1;
 		item->sortOrder = 2;
@@ -132,6 +133,8 @@ void SceneDev1::Update(float dt)
 {
 	Scene::Update(dt);
 
+	itemTimer -= dt;
+
 	if (isGameOver)
 	{
 		SCENE_MGR.ChangeScene(sceneId);
@@ -161,6 +164,21 @@ void SceneDev1::Update(float dt)
 	{
 		SpawnItem(player->GetPosition(), 1000.f);
 	}
+	if (itemTimer < 0)
+	{
+		SpawnItem(player->GetPosition(), 1000.f);
+		itemTimer = itemTimerdefault;
+	}
+
+	for (auto item : itemPool.GetUseList())
+	{
+		if (item->sprite.getGlobalBounds().intersects(player->sprite.getGlobalBounds()))
+		{
+			UseAndDeleteItem(item);
+		}
+	}
+
+	std::cout << "health : " << player->GetHealth() << " Ammo : " << player->GetAmmo() << std::endl;
 }
 
 void SceneDev1::Draw(sf::RenderWindow& window)
@@ -275,7 +293,7 @@ const std::list<Zombie*>* SceneDev1::GetZombieList() const
 
 void SceneDev1::SpawnItem(sf::Vector2f center, float radius)
 {
-	std::cout << "아이템 출력 테스트" << std::endl;
+	//std::cout << "아이템 출력 테스트" << std::endl;
 	SpriteItem* item = itemPool.Get();
 	sf::Vector2f pos;
 	do
@@ -285,6 +303,11 @@ void SceneDev1::SpawnItem(sf::Vector2f center, float radius)
 
 	item->SetPosition(pos);
 	item->sortLayer = 1; 
-	std::cout << "아이템 위치정보 x : " <<item->GetPosition().x<<"y : "<< item->GetPosition().y << std::endl;
+	//std::cout << "아이템 위치정보 x : " <<item->GetPosition().x<<"y : "<< item->GetPosition().y << std::endl;
 	AddGo(item);
+}
+
+void SceneDev1::UseAndDeleteItem(SpriteItem* item)
+{
+	item->UseItem();
 }
