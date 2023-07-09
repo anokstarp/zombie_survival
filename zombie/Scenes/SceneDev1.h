@@ -6,6 +6,7 @@ class Player;
 class Zombie;
 class VertexArrayGo;
 class SpriteEffect;
+class SpriteItem;
 
 class SceneDev1 : public Scene
 {
@@ -14,6 +15,8 @@ protected:
 	Player* player;
 	ObjectPool<Zombie> zombiePool;
 	ObjectPool<SpriteEffect> bloodEffectPool;
+	ObjectPool<SpriteItem> itemPool;
+	
 
 	sf::FloatRect wallBounds;
 	bool isGameOver;
@@ -45,6 +48,7 @@ public:
 
 	const std::list<Zombie*>* GetZombieList() const;
 
+	void SpawnItem(sf::Vector2f center, float radius);
 };
 
 template<typename T>

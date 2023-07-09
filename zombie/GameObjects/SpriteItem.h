@@ -1,16 +1,40 @@
 #pragma once
 #include "stdafx.h"
 #include "SpriteGo.h"
+#include "ObjectPool.h"
 
 class Player;
 
 class SpriteItem : public SpriteGo
 {
-protected:	
+public: 
+	using EffectFunction = std::function<void(Player*, int)>;
+	enum class Types
+	{
+		MediKit,
+		Ammo
+	};
+	static const int TotalTypes = 2;
+	static const std::string TextureIds[2];
+	static const EffectFunction Effects[2];
+	static int Amounts[2];
+	static void ResetAmount();
 
-	Player* player =nullptr;
+protected:
+	Types itemType;
+	int amount;
+
+	Player* player = nullptr;
+	ObjectPool<SpriteItem*>* pool = nullptr;
 public:
-	SpriteItem(const std::string& textureId, const std::string& n);
+	SpriteItem(const std::string& n = "");
 	virtual ~SpriteItem() override;
 
+	virtual void Reset() override;
+
+	void SetType(Types type);
+	void AddAmount(Types type, int amount);
+
+	void IsCollidedWithItem();
+	void SetPlayer(Player* player);
 };

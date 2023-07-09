@@ -9,6 +9,7 @@
 #include "Framework.h"
 #include "Zombie.h"
 #include "SpriteEffect.h"
+#include "SpriteItem.h"
 
 SceneDev1::SceneDev1()
 	: Scene(SceneId::Dev1), player(nullptr)
@@ -21,6 +22,9 @@ SceneDev1::SceneDev1()
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/crawler.png"));
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/bullet.png"));
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/blood.png"));
+	//230710 장다훈
+	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/ammo_icon.png"));
+	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/health_pickup.png"));
 }
 
 SceneDev1::~SceneDev1()
@@ -77,12 +81,18 @@ void SceneDev1::Init()
 		effect->SetPool(&bloodEffectPool);
 	};
 	bloodEffectPool.Init();
+
+	//230710 장다훈
+	itemPool.OnCreate = [this](SpriteItem* item) {item->SetPlayer(player); };
+	itemPool.Init();
 }
 
 void SceneDev1::Release()
 {
 	zombiePool.Release();
 	bloodEffectPool.Release();
+	//230710 장다훈
+	itemPool.Release();
 
 	for (auto go : gameObjects)
 	{
@@ -94,7 +104,9 @@ void SceneDev1::Release()
 void SceneDev1::Enter()
 {
 	Scene::Enter();
-
+	//230710 장다훈
+	//게임 중 늘어난 아이템의 효과정도 초기화
+	SpriteItem::ResetAmount();
 	isGameOver = false;
 	player->SetPosition(0.f, 0.f);
 }
@@ -104,6 +116,7 @@ void SceneDev1::Exit()
 	//ClearZombies();
 	ClearObjectPool(zombiePool);
 	ClearObjectPool(bloodEffectPool);
+	ClearObjectPool(itemPool);
 
 	player->Reset();
 
@@ -137,6 +150,11 @@ void SceneDev1::Update(float dt)
 	{
 		//ClearZombies();
 		ClearObjectPool(zombiePool);
+	}
+
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num3))
+	{
+		SpawnItem(player->GetPosition(), 1000.f);
 	}
 }
 
@@ -248,4 +266,18 @@ void SceneDev1::OnDiePlayer()
 const std::list<Zombie*>* SceneDev1::GetZombieList() const
 {
 	return &zombiePool.GetUseList();
+}
+
+void SceneDev1::SpawnItem(sf::Vector2f center, float radius)
+{
+	SpriteItem* item = itemPool.Get();
+	sf::Vector2f pos;
+	do
+	{
+		pos = center + Utils::RandomInCircle(radius);
+	} while (Utils::Distance(center, pos) < 100.f && radius > 100.f);
+
+	item->SetPosition(pos);
+	item->sortLayer = 1;
+	AddGo(item);
 }

@@ -138,11 +138,20 @@ void Player::SetWallBounds(const sf::FloatRect& bounds)
 void Player::ReloadMagazine()
 {
 	reloadTimer = reloadingSpeed;
-		
+
+	if (remainAmmo + curAmmo == 0)
+		return;
 	int tempAmmo = remainAmmo + curAmmo - magCapacity;// 연산을 위한 임시객체
 	remainAmmo = std::max(tempAmmo, 0); // 총 남은 탄 수가 0보다 적다면 remainAmmo를 0으로 설정
 	curAmmo = remainAmmo == 0 ? magCapacity + tempAmmo : magCapacity; // remainAmmo이 0 이면 총 남은 탄 수를 curAmmo로 설정 아니면 magCapacity를 curAmmo로 설정
 
+}
+
+void Player::AddHealth(int amount)
+{
+	hp += amount;
+	if (hp > maxHp)
+		hp = maxHp;	
 }
 
 void Player::OnHitted(int damage)

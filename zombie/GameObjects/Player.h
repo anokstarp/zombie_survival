@@ -43,6 +43,12 @@ public:
 	//230707 장다훈
 	//재장전 구현
 	void ReloadMagazine();
+	//230710 장다훈
+	//아이템을 이용한 값 수정 및 획득
+	void AddAmmo(int amount) { remainAmmo += amount; }
+	void AddHealth(int amount);
+	int GetAmmo() { return remainAmmo + curAmmo; }
+	int GetHealth() { return hp; }
 
 	void OnHitted(int damage);
 	void OnDie();
