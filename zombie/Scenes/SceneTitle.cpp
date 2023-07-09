@@ -6,6 +6,9 @@
 #include "SceneMgr.h"
 #include "SpriteGo.h"
 #include "Framework.h"
+// ±è¹ÎÁö, 230709
+#include "SceneDev1.h"
+////////////////
 
 SceneTitle::SceneTitle(SceneId id)
 	: Scene(SceneId::Title)
@@ -24,6 +27,7 @@ void SceneTitle::Init()
 
 	AddGo(new SpriteGo("graphics/background_resize.png", "TitleBackground"));
 	AddGo(new TextGo("Title", "fonts/zombiecontrol.ttf"));
+	AddGo(new TextGo("hiScore", "fonts/zombiecontrol.ttf"));
 
 	for (auto go : gameObjects)
 	{
@@ -51,18 +55,33 @@ void SceneTitle::Enter()
 
 	SpriteGo* titleBackground = (SpriteGo*)FindGo("TitleBackground");
 	TextGo* titleText = (TextGo*)FindGo("Title");
+	TextGo* hiScore = (TextGo*)FindGo("hiScore");
 
 	// ¹è°æ
 	titleBackground->SetOrigin(Origins::MC);
 	titleBackground->SetPosition(FRAMEWORK.GetWindowSize() / 2.f);
 
 	// ÅØ½ºÆ®
-	titleText->text.setFont(*RESOURCE_MGR.GetFont("fonts/zombiecontrol.ttf"));
 	titleText->text.setString("PRESS ENTER TO PLAY");
 	titleText->text.setCharacterSize(75);
 	titleText->text.setFillColor(sf::Color::White);
 	titleText->SetOrigin(Origins::MC);
 	titleText->SetPosition(FRAMEWORK.GetWindowSize() / 2.f);
+
+	// hiScore
+	Scene* scene = SCENE_MGR.GetGameScene();
+	SceneDev1* sceneDev1 = dynamic_cast<SceneDev1*>(scene);
+	if (sceneDev1 != nullptr)
+	{
+		int hiScoreNum = sceneDev1->GetHiScore();
+		std::stringstream ss;
+		ss << "HI SCORE:" << hiScoreNum;
+		hiScore->text.setString(ss.str());
+	}
+	hiScore->text.setCharacterSize(50);
+	hiScore->text.setFillColor(sf::Color::White);
+	hiScore->SetOrigin(Origins::TL);
+	hiScore->SetPosition(FRAMEWORK.GetWindowSize().x - 300.f, 10.f);
 }
 
 void SceneTitle::Exit()

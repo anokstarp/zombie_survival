@@ -64,3 +64,8 @@ Scene* SceneMgr::GetCurrScene() const
 {
 	return currentScene;
 }
+
+Scene* SceneMgr::GetGameScene() const
+{
+	return scenes[(int)SceneId::Dev1];
+}

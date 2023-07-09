@@ -126,6 +126,7 @@ void SceneDev1::Enter()
 
 	// 김민지, 230708, ui 세팅
 	leftZombies = 0;
+	wave = 0;
 
 	TextGo* score = (TextGo*)FindGo("score");
 	TextGo* hiScore = (TextGo*)FindGo("hiScore");
@@ -296,6 +297,9 @@ void SceneDev1::Update(float dt)
 	if (!isStageStart)
 	{
 		wave++;
+		// 김민지, 230709, 매 스테이지마다 score 0으로 초기화
+		score = 0;
+		////////////////////////////////////////////////
 		currentStage++;
 		player->SetPosition(0.f, 0.f);
 		SpawnZombies(30 * currentStage, player->GetPosition(), 1200.f);
@@ -475,8 +479,16 @@ void SceneDev1::SetUiData()
 	ss3 << "ZOMBIES:" << this->leftZombies;
 	leftZombies->text.setString(ss3.str());
 
+	std::stringstream ss4;
+	ss4 << "WAVE:" << this->wave;
+	wave->text.setString(ss4.str());
+
 	// leftBullets => 탄약 구현 후 추가
-	// wave => 스테이지 구현 후 
+}
+
+int SceneDev1::GetHiScore()
+{
+	return hiScore;
 }
 
 bool SceneDev1::CheckGameover()

@@ -7,9 +7,9 @@ class ObjectPool
 protected:
 	std::list<T*> pool;
 	std::list<T*> useList;
-
-	void CreateObjs(int count = 100);
-
+	// 김민지, 230709, 남석이형 말대로 1000으로 바꿈
+	void CreateObjs(int count = 1000);
+	///////////////////////////////////////////
 public:
 	ObjectPool() = default;
 	~ObjectPool();

@@ -61,8 +61,9 @@ public:
 
 	const std::list<Zombie*>* GetZombieList() const;
 
-	// 梯團雖, 230708, UI 高 撮た л熱
+	// 梯團雖, 230708, UI 高 撮た л熱, hiScore GET л熱 蹺陛
 	void SetUiData();
+	int GetHiScore();
 	///////////////////////////////
 
 	bool CheckGameover();
