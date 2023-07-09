@@ -83,7 +83,12 @@ void SceneDev1::Init()
 	bloodEffectPool.Init();
 
 	//230710 장다훈
-	itemPool.OnCreate = [this](SpriteItem* item) {item->SetPlayer(player); };
+	itemPool.OnCreate = [this](SpriteItem* item) 
+	{
+		item->SetPlayer(player); 
+		item->sortLayer = 1;
+		item->sortOrder = 2;
+	};
 	itemPool.Init();
 }
 
@@ -270,6 +275,7 @@ const std::list<Zombie*>* SceneDev1::GetZombieList() const
 
 void SceneDev1::SpawnItem(sf::Vector2f center, float radius)
 {
+	std::cout << "아이템 출력 테스트" << std::endl;
 	SpriteItem* item = itemPool.Get();
 	sf::Vector2f pos;
 	do
@@ -278,6 +284,7 @@ void SceneDev1::SpawnItem(sf::Vector2f center, float radius)
 	} while (Utils::Distance(center, pos) < 100.f && radius > 100.f);
 
 	item->SetPosition(pos);
-	item->sortLayer = 1;
+	item->sortLayer = 1; 
+	std::cout << "아이템 위치정보 x : " <<item->GetPosition().x<<"y : "<< item->GetPosition().y << std::endl;
 	AddGo(item);
 }

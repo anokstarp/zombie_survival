@@ -27,6 +27,7 @@ void SpriteItem::Reset()
 {
 	int ammo = player->GetAmmo();
 	int hp = player->GetHealth();
+	std::cout << "아이템 리셋" << std::endl;
 	if (ammo < 50)
 	{
 		SetType(Types::Ammo);
@@ -43,11 +44,12 @@ void SpriteItem::Reset()
 	{
 		SetType(Types::MediKit);
 	}
-
+	SpriteGo::Reset();
 }
 
 void SpriteItem::SetType(Types type)
 {
+	std::cout << "아이템 셋 타입" << std::endl;
 	itemType = type;
 	int index = (int)itemType;
 	textureId = TextureIds[index];

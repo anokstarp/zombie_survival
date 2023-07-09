@@ -139,8 +139,9 @@ void Player::ReloadMagazine()
 {
 	reloadTimer = reloadingSpeed;
 
-	if (remainAmmo + curAmmo == 0)
+	if (remainAmmo + curAmmo == 0)//장전 실패
 		return;
+
 	int tempAmmo = remainAmmo + curAmmo - magCapacity;// 연산을 위한 임시객체
 	remainAmmo = std::max(tempAmmo, 0); // 총 남은 탄 수가 0보다 적다면 remainAmmo를 0으로 설정
 	curAmmo = remainAmmo == 0 ? magCapacity + tempAmmo : magCapacity; // remainAmmo이 0 이면 총 남은 탄 수를 curAmmo로 설정 아니면 magCapacity를 curAmmo로 설정
