@@ -119,6 +119,8 @@ void SceneDev1::Enter()
 	player->SetPosition(0.f, 0.f);
 
 	// ±è¹ÎÁö, 230708, ui ¼¼ÆÃ
+	leftZombies = 0;
+
 	TextGo* score = (TextGo*)FindGo("score");
 	TextGo* hiScore = (TextGo*)FindGo("hiScore");
 	TextGo* leftBullets = (TextGo*)FindGo("leftBullets");
@@ -362,6 +364,9 @@ void SceneDev1::SpawnZombies(int count, sf::Vector2f center, float radius)
 		zombie->sortLayer = 1;
 		AddGo(zombie);
 	}
+	// ±è¹ÎÁö, 230709, leftZombies ¼¼ÆÃ¿ë
+	leftZombies = count;
+	///////////////////////////////////
 }
 
 void SceneDev1::ClearZombies()
@@ -371,12 +376,23 @@ void SceneDev1::ClearZombies()
 		RemoveGo(zombie);
 	}
 	zombiePool.Clear();
+	// ±è¹ÎÁö, 230709, leftZombies ¼¼ÆÃ¿ë
+	leftZombies = 0;
+	///////////////////////////////////
 }
 
 void SceneDev1::OnDieZombie(Zombie* zombie)
 {
-	// ±è¹ÎÁö, 230708, score ¼¼ÆÃ
+	// ±è¹ÎÁö, 230708~9, score + leftZombies ¼¼ÆÃ
 	score++;
+	if (leftZombies == 0)
+	{
+		leftZombies = 0;
+	}
+	else
+	{
+		leftZombies--;
+	}
 	///////////////////////////
 
 	SpriteEffect* blood = bloodEffectPool.Get();
@@ -420,6 +436,10 @@ void SceneDev1::SetUiData()
 		ss2 << "HI SCORE:" << this->hiScore;
 		hiScore->text.setString(ss2.str());
 	}
+
+	std::stringstream ss3;
+	ss3 << "ZOMBIES:" << this->leftZombies;
+	leftZombies->text.setString(ss3.str());
 
 	// leftBullets => Åº¾à ±¸Çö ÈÄ Ãß°¡
 	// wave => ½ºÅ×ÀÌÁö ±¸Çö ÈÄ 
