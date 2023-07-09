@@ -14,10 +14,10 @@ const SpriteItem::EffectFunction SpriteItem::Effects[2] =
 	[](Player* player, int amount) {player->AddAmmo(amount); },
 	[](Player* player, int amount) {player->AddHealth(amount); },
 };
-int SpriteItem::Amounts[2] = {25, 120};
+int SpriteItem::Amounts[2] = {120, 20};
 
 SpriteItem::SpriteItem(const std::string& n)
-	:SpriteGo("", n),amount(0)
+	:SpriteGo("", n),amount(0),itemType(Types::Default)
 {
 }
 
@@ -38,7 +38,7 @@ void SpriteItem::Reset()
 	{
 		SetType(Types::MediKit);
 	}
-	else if(ammo < Utils::RandomRange(50, 1000))
+	else if(ammo < Utils::RandomRange(50, 1000))//탄약의 총 수량이 1000 이 넘으면 더 안생기도록 설정
 	{
 		SetType(Types::Ammo);
 	}
@@ -48,6 +48,14 @@ void SpriteItem::Reset()
 	}
 
 	SpriteGo::Reset();
+}
+
+void SpriteItem::Update(float dt)
+{
+	if (sprite.getGlobalBounds().intersects(player->sprite.getGlobalBounds()))
+	{
+		UseItem();
+	}
 }
 
 void SpriteItem::SetType(Types type)
@@ -75,6 +83,6 @@ void SpriteItem::SetPlayer(Player* player)
 
 void SpriteItem::ResetAmount()
 {
-	SpriteItem::Amounts[0] = 25;
-	SpriteItem::Amounts[1] = 120;
+	SpriteItem::Amounts[0] = 120;
+	SpriteItem::Amounts[1] = 20;
 }

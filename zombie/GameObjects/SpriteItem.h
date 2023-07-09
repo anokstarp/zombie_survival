@@ -11,8 +11,9 @@ public:
 	using EffectFunction = std::function<void(Player*, int)>;
 	enum class Types
 	{
-		MediKit,
+		Default = -1,
 		Ammo,
+		MediKit,
 	};
 	static const int TotalTypes = 2;
 	static const std::string TextureIds[2];
@@ -30,7 +31,8 @@ public:
 	SpriteItem(const std::string& n = "");
 	virtual ~SpriteItem() override;
 
-	virtual void Reset() override;
+	virtual void Reset() override; 
+	virtual void Update(float dt) override;
 
 	void SetType(Types type);
 	void AddAmount(Types type, int amount) { SpriteItem::Amounts[(int)type] += amount; }

@@ -169,15 +169,6 @@ void SceneDev1::Update(float dt)
 		SpawnItem(player->GetPosition(), 1000.f);
 		itemTimer = itemTimerdefault;
 	}
-
-	for (auto item : itemPool.GetUseList())
-	{
-		if (item->sprite.getGlobalBounds().intersects(player->sprite.getGlobalBounds()))
-		{
-			UseAndDeleteItem(item);
-		}
-	}
-
 	std::cout << "health : " << player->GetHealth() << " Ammo : " << player->GetAmmo() << std::endl;
 }
 
