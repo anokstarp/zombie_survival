@@ -17,13 +17,17 @@ protected:
 
 	sf::FloatRect wallBounds;
 	bool isGameOver;
-	bool isStateClear;
+	bool isStageClear;
+	bool isStageStart = false;
+
+	int totalStage = 10;
+	int currentStage = 0;
 
 	// ±è¹ÎÁö, 230708, ui data
 	int score = 0;
 	int hiScore = 0;
 	int leftBullets = 0;
-	int wave = 1;
+	int wave = 0;
 	int leftZombies = 0;
 
 	int frame = 0;

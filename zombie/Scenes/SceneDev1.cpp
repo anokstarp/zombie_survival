@@ -121,10 +121,12 @@ void SceneDev1::Enter()
 	Scene::Enter();
 
 	isGameOver = false;
-	isStateClear = false;
+	isStageClear = false;
 	player->SetPosition(0.f, 0.f);
 
 	// ±è¹ÎÁö, 230708, ui ¼¼ÆÃ
+	leftZombies = 0;
+
 	TextGo* score = (TextGo*)FindGo("score");
 	TextGo* hiScore = (TextGo*)FindGo("hiScore");
 	TextGo* leftBullets = (TextGo*)FindGo("leftBullets");
@@ -290,6 +292,15 @@ void SceneDev1::Update(float dt)
 	if (CheckStageClear())
 		return;
 
+	if (!isStageStart)
+	{
+		wave++;
+		currentStage++;
+		player->SetPosition(0.f, 0.f);
+		SpawnZombies(30 * currentStage, player->GetPosition(), 1200.f);
+		isStageStart = true;
+	}
+
 	Scene::Update(dt);
 
 	worldView.setCenter(player->GetPosition());
@@ -309,7 +320,7 @@ void SceneDev1::Update(float dt)
 	{
 		//ClearZombies();
 		ClearObjectPool(zombiePool);
-		isStateClear = true;
+		isStageClear = true;
 	}
 }
 
@@ -386,6 +397,9 @@ void SceneDev1::SpawnZombies(int count, sf::Vector2f center, float radius)
 		zombie->sortLayer = 1;
 		AddGo(zombie);
 	}
+	// ±è¹ÎÁö, 230709, leftZombies ¼¼ÆÃ¿ë
+	leftZombies = count;
+	///////////////////////////////////
 }
 
 void SceneDev1::ClearZombies()
@@ -395,12 +409,23 @@ void SceneDev1::ClearZombies()
 		RemoveGo(zombie);
 	}
 	zombiePool.Clear();
+	// ±è¹ÎÁö, 230709, leftZombies ¼¼ÆÃ¿ë
+	leftZombies = 0;
+	///////////////////////////////////
 }
 
 void SceneDev1::OnDieZombie(Zombie* zombie)
 {
-	// ±è¹ÎÁö, 230708, score ¼¼ÆÃ
+	// ±è¹ÎÁö, 230708~9, score + leftZombies ¼¼ÆÃ
 	score++;
+	if (leftZombies == 0)
+	{
+		leftZombies = 0;
+	}
+	else
+	{
+		leftZombies--;
+	}
 	///////////////////////////
 
 	SpriteEffect* blood = bloodEffectPool.Get();
@@ -445,6 +470,10 @@ void SceneDev1::SetUiData()
 		hiScore->text.setString(ss2.str());
 	}
 
+	std::stringstream ss3;
+	ss3 << "ZOMBIES:" << this->leftZombies;
+	leftZombies->text.setString(ss3.str());
+
 	// leftBullets => Åº¾à ±¸Çö ÈÄ Ãß°¡
 	// wave => ½ºÅ×ÀÌÁö ±¸Çö ÈÄ 
 }
@@ -477,50 +506,55 @@ bool SceneDev1::CheckGameover()
 
 bool SceneDev1::CheckStageClear()
 {
-	if (isStateClear)
+	if (isStageClear)
 	{
 		TextGo* stageClear = (TextGo*)FindGo("StageClear");
 		stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 255));
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num1))
 		{	
-
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num2))
 		{
 
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num3))
 		{
 			player->IncreaseHealth(20);
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num4))
 		{
 			player->IncreaseSpeed(20);
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num5))
 		{
 			Bullet::addDamage += 5;
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num6))
 		{
 			player->IncreaseProjectile(1);
 			stageClear->text.setFillColor(sf::Color::Color(255, 255, 255, 0));
-			isStateClear = false;
+			isStageClear = false;
+			isStageStart = false;
 			return false;
 		}
 		return true;
