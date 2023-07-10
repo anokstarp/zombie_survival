@@ -23,6 +23,9 @@ protected:
 	int totalStage = 10;
 	int currentStage = 0;
 
+	int totalStage = 10;
+	int currentStage = 0;
+
 	// 梯團雖, 230708, ui data
 	int score = 0;
 	int hiScore = 0;
@@ -32,6 +35,8 @@ protected:
 
 	int frame = 0;
 	float dtTotal = 0.f;
+
+	sf::Sound sound;
 	//////////////////
 
 public:
@@ -61,8 +66,9 @@ public:
 
 	const std::list<Zombie*>* GetZombieList() const;
 
-	// 梯團雖, 230708, UI 高 撮た л熱
+	// 梯團雖, 230708, UI 高 撮た л熱, hiScore GET л熱 蹺陛
 	void SetUiData();
+	int GetHiScore();
 	///////////////////////////////
 
 	bool CheckGameover();

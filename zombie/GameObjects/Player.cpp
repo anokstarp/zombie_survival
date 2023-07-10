@@ -6,6 +6,9 @@
 #include "SceneDev1.h"
 #include "Utils.h"
 #include <iostream>
+// 김민지, 230709, 사운드용 리소스 가져오기
+#include "ResourceMgr.h"
+///////////////////////////////////////
 
 Player::Player(const std::string& textureId = "", const std::string& n = "")
 	: SpriteGo(textureId, n)
@@ -77,6 +80,10 @@ void Player::Update(float dt)
 
 	if (INPUT_MGR.GetMouseButtonDown(sf::Mouse::Left))
 	{
+		// 김민지, 230709, 총발사 사운드 (나중에 총알 없으면 소리 안 나게 바꾸기)
+		sound.setBuffer(*RESOURCE_MGR.GetSoundBuffer("sound/shoot.wav"));
+		sound.play();
+		////////////////////////////////////////////////
 		//2023-07-09 이남석
 		//총알 projectile 만큼 발사되게 수정
 		Scene* scene = SCENE_MGR.GetCurrScene();
@@ -123,6 +130,11 @@ void Player::SetWallBounds(const sf::FloatRect& bounds)
 
 void Player::OnHitted(int damage)
 {
+	// 김민지, 230709, 맞을 때 사운드 추가
+	sound.setBuffer(*RESOURCE_MGR.GetSoundBuffer("sound/hit.wav"));
+	sound.play();
+	//////////////////////////////////
+
 	if (!isAlive)
 		return;
 

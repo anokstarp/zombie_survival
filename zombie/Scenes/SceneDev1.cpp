@@ -9,7 +9,7 @@
 #include "Framework.h"
 #include "Zombie.h"
 #include "SpriteEffect.h"
-// 김민지, 230708
+// 김민지, 230708~9
 #include "TextGo.h"
 #include "RectGo.h"
 ////////////////
@@ -20,6 +20,13 @@ SceneDev1::SceneDev1()
 	// 김민지, 230708
 	resources.push_back(std::make_tuple(ResourceTypes::Font, "fonts/zombiecontrol.ttf"));
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/ammo_icon.png"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/hit.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/pickup.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/powerup.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/reload.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/reload_failed.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/shoot.wav"));
+	resources.push_back(std::make_tuple(ResourceTypes::SoundBuffer, "sound/splat.wav"));
 	////////////////
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/player.png"));
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/background_sheet.png"));
@@ -54,13 +61,16 @@ void SceneDev1::Init()
 	VertexArrayGo* background = CreateBackground({ 50, 50 }, tileWorldSize, tileTexSize, "graphics/background_sheet.png");
 	AddGo(background);
 
-	// 김민지, 230708, ui AddGo
+	// 김민지, 230708~9, ui AddGo + fps + sound
 	AddGo(new TextGo("score", "fonts/zombiecontrol.ttf"));
 	AddGo(new TextGo("hiScore", "fonts/zombiecontrol.ttf"));
 	AddGo(new TextGo("leftBullets", "fonts/zombiecontrol.ttf"));
 	AddGo(new TextGo("wave", "fonts/zombiecontrol.ttf"));
 	AddGo(new TextGo("leftZombies", "fonts/zombiecontrol.ttf"));
 	AddGo(new SpriteGo("graphics/ammo_icon.png", "bulletImg"));
+	// 김민지, 230709, hpBar 배경 추가
+	AddGo(new RectGo("hpBarBg"));
+	////////////////////////////////
 	AddGo(new RectGo("hpBar"));
 
 	AddGo(new TextGo("fps", "fonts/zombiecontrol.ttf"));
@@ -126,6 +136,7 @@ void SceneDev1::Enter()
 
 	// 김민지, 230708, ui 세팅
 	leftZombies = 0;
+	wave = -1;
 
 	TextGo* score = (TextGo*)FindGo("score");
 	TextGo* hiScore = (TextGo*)FindGo("hiScore");
@@ -133,6 +144,9 @@ void SceneDev1::Enter()
 	TextGo* wave = (TextGo*)FindGo("wave");
 	TextGo* leftZombies = (TextGo*)FindGo("leftZombies");
 	SpriteGo* bulletImg = (SpriteGo*)FindGo("bulletImg");
+	// 김민지, 230709, hpBar 배경 추가
+	RectGo* hpBarBg = (RectGo*)FindGo("hpBarBg");
+	////////////////////////////////
 	RectGo* hpBar = (RectGo*)FindGo("hpBar");
 	TextGo* fps = (TextGo*)FindGo("fps");
 	//2023-07-09 이남석
@@ -199,6 +213,14 @@ void SceneDev1::Enter()
 	hpBar->SetPosition(250.f, screenSize.y - 10.f);
 	hpBar->sortLayer = 100;
 
+	// 김민지, 230709, hpBar 배경 추가
+	sf::RectangleShape& hpRectBg = hpBarBg->GetRect();
+	hpRectBg.setFillColor(sf::Color::White);
+	hpRectBg.setSize(sf::Vector2f( 350.f, 40.f ));
+	hpBarBg->SetOrigin(Origins::BL);
+	hpBarBg->SetPosition(250.f, screenSize.y - 10.f);
+	hpBarBg->sortLayer = 100;
+	///////////////////////////////
 	fps->text.setString("FPS:0");
 	fps->text.setCharacterSize(50);
 	fps->text.setFillColor(sf::Color::White);
@@ -273,17 +295,14 @@ void SceneDev1::Update(float dt)
 			fps->SetActive(true);
 		}
 	}
-	// hpBar 길이 세팅, 출력
-	RectGo* hpBar = (RectGo*)FindGo("hpBar");
-	sf::RectangleShape& hpRect = hpBar->GetRect();
-	float hpBarWidth = (float)player->GetHp() / 100.f;
-	hpRect.setSize(sf::Vector2f(350.f * hpBarWidth, 40.f));
+	// 김민지, 230709, hp바 위치 세팅하는 거를 ui세팅함수로 옮김
 	// ui값 세팅 함수
 	SetUiData();
 	/////////////////////////
 
 	//2023-07-07 이남석
 	//Scene::Update 위치 수정, 사망시 키 입력 받아서 초기화
+	if (leftZombies <= 0 && isStageStart) { isStageClear = true; }
 	if (CheckGameover())
 		return;
 	
@@ -295,6 +314,15 @@ void SceneDev1::Update(float dt)
 	if (!isStageStart)
 	{
 		wave++;
+		// 김민지, 230709, 매 스테이지마다 score 0으로 초기화
+		score = 0;
+
+		if (wave != 0)
+		{
+			sound.setBuffer(*RESOURCE_MGR.GetSoundBuffer("sound/powerup.wav"));
+			sound.play();
+		}
+		////////////////////////////////////////////////
 		currentStage++;
 		player->SetPosition(0.f, 0.f);
 		SpawnZombies(30 * currentStage, player->GetPosition(), 1200.f);
@@ -441,7 +469,10 @@ void SceneDev1::OnDieZombie(Zombie* zombie)
 void SceneDev1::OnDiePlayer()
 {
 	isGameOver = true;
-	
+	// 김민지, 230709, 죽음 사운드
+	sound.setBuffer(*RESOURCE_MGR.GetSoundBuffer("sound/splat.wav"));
+	sound.play();
+	///////////////////////////
 	//SCENE_MGR.ChangeScene(sceneId);
 }
 
@@ -457,6 +488,18 @@ void SceneDev1::SetUiData()
 	TextGo* leftBullets = (TextGo*)FindGo("leftBullets");
 	TextGo* wave = (TextGo*)FindGo("wave");
 	TextGo* leftZombies = (TextGo*)FindGo("leftZombies");
+	RectGo* hpBar = (RectGo*)FindGo("hpBar");
+
+	sf::RectangleShape& hpRect = hpBar->GetRect();
+	if (player->GetHp() >= 100)
+	{
+		hpRect.setSize(sf::Vector2f(350.f, 40.f));
+	}
+	else
+	{
+		float hpBarWidth = (float)player->GetHp() / 100.f;
+		hpRect.setSize(sf::Vector2f(350.f * hpBarWidth, 40.f));
+	}
 
 	std::stringstream ss;
 	ss << "SCORE:" << this->score;
@@ -474,8 +517,16 @@ void SceneDev1::SetUiData()
 	ss3 << "ZOMBIES:" << this->leftZombies;
 	leftZombies->text.setString(ss3.str());
 
+	std::stringstream ss4;
+	ss4 << "WAVE:" << this->wave;
+	wave->text.setString(ss4.str());
+
 	// leftBullets => 탄약 구현 후 추가
-	// wave => 스테이지 구현 후 
+}
+
+int SceneDev1::GetHiScore()
+{
+	return hiScore;
 }
 
 bool SceneDev1::CheckGameover()
