@@ -109,6 +109,10 @@ void SceneTitle::Update(float dt)
 	{
 		ChangeLang(Languages::ENG);
 	}
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Numpad3))
+	{
+		ChangeLang(Languages::JP);
+	}
 }
 
 void SceneTitle::Draw(sf::RenderWindow& window)
@@ -130,8 +134,15 @@ void SceneTitle::Draw(sf::RenderWindow& window)
 
 void SceneTitle::ChangeLang(Languages lang)
 {
+	Variables::CurrentLang = lang;
 	auto stringData = DATATABLE_MGR.Get<StringTable>(DataTable::Ids::String);
 	TextGo* titleText = (TextGo*)FindGo("Title");
+	std::string temp = stringData->Get("TITLE");
+	titleText->text.setString(temp);
 
-	titleText->text.setString(stringData->Get("TITLE", lang));
+	if (lang == Languages::KOR)
+	{
+		titleText->text.setString("Á¸¸Á°×");
+	}
+	std::cout << temp << std::endl;
 }
