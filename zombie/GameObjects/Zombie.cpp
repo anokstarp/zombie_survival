@@ -4,7 +4,7 @@
 #include "Player.h"
 #include "SceneMgr.h"
 #include "SceneDev1.h"
-
+/*
 const std::string Zombie::textureIds[3] = {
 		"graphics/bloater.png",
 		"graphics/chaser.png",
@@ -14,7 +14,7 @@ const float Zombie::speedStats[3] = { 40.f, 70.f, 20.f };
 const int Zombie::hpStats[3] = { 100, 75, 50 };
 const int Zombie::damageStats[3] = { 10, 5, 7 };
 const float Zombie::attackRateStats[3] = { 2.f, 0.5, 1.f };
-
+*/
 Zombie::Zombie(const std::string& n)
 	: SpriteGo("", n)
 {

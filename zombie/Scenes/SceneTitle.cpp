@@ -8,6 +8,8 @@
 #include "Framework.h"
 // ±è¹ÎÁö, 230709
 #include "SceneDev1.h"
+#include "DataTableManager.h"
+#include "StringTable.h"
 ////////////////
 
 SceneTitle::SceneTitle(SceneId id)
@@ -52,6 +54,7 @@ void SceneTitle::Release()
 void SceneTitle::Enter()
 {
 	Scene::Enter();
+	auto stringTable = DATATABLE_MGR.Get<StringTable>(DataTable::Ids::String);
 
 	SpriteGo* titleBackground = (SpriteGo*)FindGo("TitleBackground");
 	TextGo* titleText = (TextGo*)FindGo("Title");
@@ -62,7 +65,8 @@ void SceneTitle::Enter()
 	titleBackground->SetPosition(FRAMEWORK.GetWindowSize() / 2.f);
 
 	// ÅØ½ºÆ®
-	titleText->text.setString("PRESS ENTER TO PLAY");
+
+	titleText->text.setString(stringTable->Get("HELLO"));
 	titleText->text.setCharacterSize(75);
 	titleText->text.setFillColor(sf::Color::White);
 	titleText->SetOrigin(Origins::MC);

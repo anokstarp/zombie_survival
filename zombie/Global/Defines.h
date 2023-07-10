@@ -2,6 +2,13 @@
 
 #define _USE_MATH_DEFINES
 
+enum class Languages
+{
+	KOR,
+	ENG,
+	JP,
+	Count,
+};
 
 enum class Origins
 {
