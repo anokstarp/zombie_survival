@@ -13,6 +13,7 @@
 #include "TextGo.h"
 #include "RectGo.h"
 ////////////////
+#include "SpriteItem.h"
 
 SceneDev1::SceneDev1()
 	: Scene(SceneId::Dev1), player(nullptr)
@@ -36,6 +37,9 @@ SceneDev1::SceneDev1()
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/crawler.png"));
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/bullet.png"));
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/blood.png"));
+	//230710 장다훈
+	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/ammo_icon.png"));
+	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/health_pickup.png"));
 }
 
 SceneDev1::~SceneDev1()
@@ -112,12 +116,24 @@ void SceneDev1::Init()
 		effect->SetPool(&bloodEffectPool);
 	};
 	bloodEffectPool.Init();
+
+	//230710 장다훈
+	itemPool.OnCreate = [this](SpriteItem* item) 
+	{
+		item->SetPool(&itemPool);
+		item->SetPlayer(player); 
+		item->sortLayer = 1;
+		item->sortOrder = 2;
+	};
+	itemPool.Init();
 }
 
 void SceneDev1::Release()
 {
 	zombiePool.Release();
 	bloodEffectPool.Release();
+	//230710 장다훈
+	itemPool.Release();
 
 	for (auto go : gameObjects)
 	{
@@ -129,14 +145,16 @@ void SceneDev1::Release()
 void SceneDev1::Enter()
 {
 	Scene::Enter();
-
+	//230710 장다훈
+	//게임 중 늘어난 아이템의 효과정도 초기화
+	SpriteItem::ResetAmount();
 	isGameOver = false;
 	isStageClear = false;
 	player->SetPosition(0.f, 0.f);
 
 	// 김민지, 230708, ui 세팅
 	leftZombies = 0;
-	wave = -1;
+	wave = 0;
 
 	TextGo* score = (TextGo*)FindGo("score");
 	TextGo* hiScore = (TextGo*)FindGo("hiScore");
@@ -210,7 +228,7 @@ void SceneDev1::Enter()
 	hpRect.setFillColor(sf::Color::Red);
 	hpRect.setSize(sf::Vector2f( 350.f, 40.f ));
 	hpBar->SetOrigin(Origins::BL);
-	hpBar->SetPosition(250.f, screenSize.y - 10.f);
+	hpBar->SetPosition(300.f, screenSize.y - 10.f);
 	hpBar->sortLayer = 100;
 
 	// 김민지, 230709, hpBar 배경 추가
@@ -218,7 +236,7 @@ void SceneDev1::Enter()
 	hpRectBg.setFillColor(sf::Color::White);
 	hpRectBg.setSize(sf::Vector2f( 350.f, 40.f ));
 	hpBarBg->SetOrigin(Origins::BL);
-	hpBarBg->SetPosition(250.f, screenSize.y - 10.f);
+	hpBarBg->SetPosition(300.f, screenSize.y - 10.f);
 	hpBarBg->sortLayer = 100;
 	///////////////////////////////
 	fps->text.setString("FPS:0");
@@ -261,6 +279,7 @@ void SceneDev1::Exit()
 	//ClearZombies();
 	ClearObjectPool(zombiePool);
 	ClearObjectPool(bloodEffectPool);
+	ClearObjectPool(itemPool);
 
 	player->Reset();
 
@@ -309,7 +328,11 @@ void SceneDev1::Update(float dt)
 	////////////////////////////////////////////////////
 	//스킬 강화 업뎃
 	if (CheckStageClear())
-		return;
+	{
+		Scene::Update(dt);
+	}
+
+	itemTimer -= dt;
 
 	if (!isStageStart)
 	{
@@ -350,6 +373,17 @@ void SceneDev1::Update(float dt)
 		ClearObjectPool(zombiePool);
 		isStageClear = true;
 	}
+
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num3))
+	{
+		SpawnItem(player->GetPosition(), 1000.f);
+	}
+	if (itemTimer < 0)
+	{
+		SpawnItem(player->GetPosition(), 1000.f);
+		itemTimer = itemTimerdefault;
+	}
+	//std::cout << "health : " << player->GetHealth() << " Ammo : " << player->GetAmmo() << std::endl;
 }
 
 void SceneDev1::Draw(sf::RenderWindow& window)
@@ -505,23 +539,26 @@ void SceneDev1::SetUiData()
 	ss << "SCORE:" << this->score;
 	score->text.setString(ss.str());
 
+	ss.str("");
 	if (this->hiScore < this->score)
 	{
 		this->hiScore = this->score;
-		std::stringstream ss2;
-		ss2 << "HI SCORE:" << this->hiScore;
-		hiScore->text.setString(ss2.str());
+		ss << "HI SCORE:" << this->hiScore;
+		hiScore->text.setString(ss.str());
 	}
 
-	std::stringstream ss3;
-	ss3 << "ZOMBIES:" << this->leftZombies;
-	leftZombies->text.setString(ss3.str());
+	ss.str("");
+	ss << "ZOMBIES:" << this->leftZombies;
+	leftZombies->text.setString(ss.str());
 
-	std::stringstream ss4;
-	ss4 << "WAVE:" << this->wave;
-	wave->text.setString(ss4.str());
+	ss.str("");
+	ss << "WAVE:" << this->wave;
+	wave->text.setString(ss.str());
 
 	// leftBullets => 탄약 구현 후 추가
+	ss.str("");
+	ss << player->GetCurAmmo() << " / " << player->GetRemainAmmo();
+	leftBullets->text.setString(ss.str());
 }
 
 int SceneDev1::GetHiScore()
@@ -611,4 +648,25 @@ bool SceneDev1::CheckStageClear()
 		return true;
 	}
 	return false;
+}
+
+void SceneDev1::SpawnItem(sf::Vector2f center, float radius)
+{
+	//std::cout << "아이템 출력 테스트" << std::endl;
+	SpriteItem* item = itemPool.Get();
+	sf::Vector2f pos;
+	do
+	{
+		pos = center + Utils::RandomInCircle(radius);
+	} while (Utils::Distance(center, pos) < 100.f && radius > 100.f);
+
+	item->SetPosition(pos);
+	item->sortLayer = 1; 
+	//std::cout << "아이템 위치정보 x : " <<item->GetPosition().x<<"y : "<< item->GetPosition().y << std::endl;
+	AddGo(item);
+}
+
+void SceneDev1::UseAndDeleteItem(SpriteItem* item)
+{
+	item->UseItem();
 }

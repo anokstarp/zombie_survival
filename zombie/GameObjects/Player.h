@@ -25,6 +25,14 @@ protected:
 
 	int projectile = 1;
 
+	//230707 장다훈
+	//탄 관련 옵션
+	int curAmmo; 
+	int magCapacity;
+	int remainAmmo;
+	float reloadingSpeed;
+	float reloadTimer;
+
 	ObjectPool<Bullet> poolBullets;
 
 public:
@@ -40,12 +48,23 @@ public:
 	void SetWallBounds(const sf::FloatRect& bounds);
 
 	bool isAlive = false;
+	//230707 장다훈
+	//재장전 구현
+	void ReloadMagazine();
+	//230710 장다훈
+	//아이템을 이용한 값 수정 및 획득
+	void AddAmmo(int amount) { remainAmmo += amount; }
+	void AddHealth(int amount);
+	int GetAmmo() { return remainAmmo + curAmmo; }
+	int GetHealth() { return hp; }
 
 	void OnHitted(int damage);
 	void OnDie();
 
 	// 김민지, 230708, hpBar 구현용 get 함수
 	int GetHp();
+	int GetCurAmmo() { return curAmmo; }
+	int GetRemainAmmo() { return remainAmmo; }
 	//////////////////////////////////////
 
 	//2023-07-09 이남석

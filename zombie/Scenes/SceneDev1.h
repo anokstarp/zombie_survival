@@ -6,6 +6,7 @@ class Player;
 class Zombie;
 class VertexArrayGo;
 class SpriteEffect;
+class SpriteItem;
 
 class SceneDev1 : public Scene
 {
@@ -14,14 +15,13 @@ protected:
 	Player* player;
 	ObjectPool<Zombie> zombiePool;
 	ObjectPool<SpriteEffect> bloodEffectPool;
+	ObjectPool<SpriteItem> itemPool;
+	
 
 	sf::FloatRect wallBounds;
 	bool isGameOver;
 	bool isStageClear;
 	bool isStageStart = false;
-
-	int totalStage = 10;
-	int currentStage = 0;
 
 	int totalStage = 10;
 	int currentStage = 0;
@@ -38,6 +38,10 @@ protected:
 
 	sf::Sound sound;
 	//////////////////
+
+	
+	float itemTimer = 30;
+	float itemTimerdefault = 10;
 
 public:
 	SceneDev1();
@@ -73,6 +77,8 @@ public:
 
 	bool CheckGameover();
 	bool CheckStageClear();
+	void SpawnItem(sf::Vector2f center, float radius);
+	void UseAndDeleteItem(SpriteItem* item);
 };
 
 template<typename T>
