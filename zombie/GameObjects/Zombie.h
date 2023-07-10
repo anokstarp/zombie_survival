@@ -13,6 +13,7 @@ public:
 		Bloater,
 		Chaser,
 		Crawler,
+		Count,
 	};
 	/*
 	static const int TotalTypes = 3;

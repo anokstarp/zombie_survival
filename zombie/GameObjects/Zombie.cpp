@@ -4,6 +4,8 @@
 #include "Player.h"
 #include "SceneMgr.h"
 #include "SceneDev1.h"
+#include "DataTableManager.h"
+#include "ZombieTable.h"
 /*
 const std::string Zombie::textureIds[3] = {
 		"graphics/bloater.png",
@@ -80,14 +82,15 @@ void Zombie::Draw(sf::RenderWindow& window)
 
 void Zombie::SetType(Types t)
 {
-	zombieType = t;
-	int index = (int)zombieType;
+	zombieType = t;	
+	ZombieInfo info = DATATABLE_MGR.Get<ZombieTable>(DataTable::Ids::Zombie)->Get((int)t);
 
-	textureId = textureIds[index];
-	speed = speedStats[index];
-	maxHp = hpStats[index];
-	damage = damageStats[index];
-	attackRate = attackRateStats[index];
+	textureId = info.textureId;
+	speed = info.speed;
+	maxHp = info.maxHp;
+	damage = info.damage;
+	attackRate = info.attackRate;
+	SpriteGo::Reset();
 }
 
 Zombie::Types Zombie::GetType() const

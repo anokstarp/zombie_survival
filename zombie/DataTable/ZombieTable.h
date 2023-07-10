@@ -20,12 +20,12 @@ class ZombieTable :
     public DataTable
 {
 protected:
-    std::vector<std::map<std::string, ZombieInfo>> tables;
-public:
-    ZombieTable() : DataTable(Ids::Zombie) {}
+    std::vector<std::map<int, ZombieInfo>> tables;
+public:    
+    ZombieTable() : DataTable(Ids::Zombie),tables((int)Zombie::Types::Count) {}
     virtual ~ZombieTable() override = default;
 
-    const ZombieInfo& Get(const std::string id) const;
+    const ZombieInfo& Get(const int id) const;
 
     // DataTable을(를) 통해 상속됨
     virtual bool Load() override;

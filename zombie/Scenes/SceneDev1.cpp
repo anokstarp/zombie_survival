@@ -103,7 +103,7 @@ void SceneDev1::Init()
 	player->SetWallBounds(wallBounds);
 
 	zombiePool.OnCreate = [this](Zombie* zombie) {
-		Zombie::Types zombieType = (Zombie::Types)Utils::RandomRange(0, Zombie::TotalTypes);
+		Zombie::Types zombieType = (Zombie::Types)Utils::RandomRange(0, (int)Zombie::Types::Count);
 		zombie->SetType(zombieType);
 		zombie->SetPlayer(player);
 	};
@@ -374,10 +374,6 @@ void SceneDev1::Update(float dt)
 		isStageClear = true;
 	}
 
-	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Num3))
-	{
-		SpawnItem(player->GetPosition(), 1000.f);
-	}
 	if (itemTimer < 0)
 	{
 		SpawnItem(player->GetPosition(), 1000.f);

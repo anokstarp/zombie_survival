@@ -16,7 +16,7 @@ SceneTitle::SceneTitle(SceneId id)
 	: Scene(SceneId::Title)
 {
 	resources.push_back(std::make_tuple(ResourceTypes::Texture, "graphics/background_resize.png"));
-	resources.push_back(std::make_tuple(ResourceTypes::Font, "fonts/zombiecontrol.ttf"));
+	resources.push_back(std::make_tuple(ResourceTypes::Font, "fonts/DOSPilgi.ttf"));
 }
 
 SceneTitle::~SceneTitle()
@@ -28,7 +28,7 @@ void SceneTitle::Init()
 	Release();
 
 	AddGo(new SpriteGo("graphics/background_resize.png", "TitleBackground"));
-	AddGo(new TextGo("Title", "fonts/zombiecontrol.ttf"));
+	AddGo(new TextGo("Title", "fonts/DOSPilgi.ttf"));
 	AddGo(new TextGo("hiScore", "fonts/zombiecontrol.ttf"));
 
 	for (auto go : gameObjects)
@@ -66,7 +66,7 @@ void SceneTitle::Enter()
 
 	// ÅØ½ºÆ®
 
-	titleText->text.setString(stringTable->Get("HELLO"));
+	titleText->text.setString(stringTable->Get("TITLE"));
 	titleText->text.setCharacterSize(75);
 	titleText->text.setFillColor(sf::Color::White);
 	titleText->SetOrigin(Origins::MC);
@@ -101,6 +101,14 @@ void SceneTitle::Update(float dt)
 	{
 		SCENE_MGR.ChangeScene(SceneId::Dev1);
 	}
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Numpad1))
+	{
+		ChangeLang(Languages::KOR);
+	}
+	if (INPUT_MGR.GetKeyDown(sf::Keyboard::Numpad2))
+	{
+		ChangeLang(Languages::ENG);
+	}
 }
 
 void SceneTitle::Draw(sf::RenderWindow& window)
@@ -118,4 +126,12 @@ void SceneTitle::Draw(sf::RenderWindow& window)
 			go->Draw(window);
 		}
 	}
+}
+
+void SceneTitle::ChangeLang(Languages lang)
+{
+	auto stringData = DATATABLE_MGR.Get<StringTable>(DataTable::Ids::String);
+	TextGo* titleText = (TextGo*)FindGo("Title");
+
+	titleText->text.setString(stringData->Get("TITLE", lang));
 }
